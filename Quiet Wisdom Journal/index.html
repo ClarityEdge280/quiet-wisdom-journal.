@@ -592,13 +592,20 @@ function renderCoverState(){
 }
 
 function submitLead(name, email){
-  // Capture point: once an email platform is chosen (Mailchimp / ConvertKit /
-  // Klaviyo / etc.), send {name, email} to that platform's signup endpoint
-  // here too — e.g. a fetch() POST to its form-submission URL — so every
-  // visitor who starts the journal becomes a real list subscriber. For now
-  // this only saves locally in this browser.
   lsSet('cwj-lead-name', name);
   lsSet('cwj-lead-email', email);
+
+  // Send the lead to Brevo via our own serverless function, which holds the
+  // Brevo API key privately (never exposed to the browser). This runs in the
+  // background — a slow or failed network call never blocks the visitor from
+  // reading their journal, it just means that one signup didn't reach Brevo.
+  try{
+    fetch('/api/subscribe', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: name, email: email })
+    }).catch(function(err){ console.error('subscribe request failed', err); });
+  }catch(e){ console.error('subscribe request failed', e); }
 }
 
 document.getElementById('signupForm').addEventListener('submit', function(e){
