@@ -1,11 +1,16 @@
-// Receives { name, email } from the Quiet · Wisdom signup form and adds the
-// person as a contact in Brevo. The Brevo API key never reaches the browser —
-// it's read here, server-side, from an environment variable you set in the
-// Netlify dashboard (Site configuration > Environment variables):
+// Receives { name, email, type } from the Quiet · Wisdom signup form and adds
+// the person as a contact in Brevo. The Brevo API key never reaches the
+// browser — it's read here, server-side, from environment variables you set
+// in the Netlify dashboard (Site configuration > Environment variables):
 //
-//   BREVO_API_KEY  - your Brevo API key (Brevo: Settings > SMTP & API > API Keys)
-//   BREVO_LIST_ID  - the numeric ID of the Brevo list to add signups to
-//                    (Brevo: Contacts > Lists > click the list > the ID is in the URL)
+//   BREVO_API_KEY      - your Brevo API key (Brevo: Settings > SMTP & API > API Keys)
+//   BREVO_LIST_ID      - the numeric ID of the Brevo list for "Just for me" signups
+//                        (Brevo: Contacts > Lists > click the list > the ID is in the URL)
+//   BREVO_TEAM_LIST_ID - the numeric ID of the Brevo list for "For my team at work"
+//                        signups. If this isn't set, team signups fall back to
+//                        BREVO_LIST_ID so nothing is ever lost.
+//
+// `type` is "individual" or "team" and picks which list the contact lands in.
 //
 // This function is reachable at /api/subscribe (see the `config` export below).
 
@@ -31,6 +36,7 @@ export default async (req) => {
 
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const email = typeof body.email === "string" ? body.email.trim() : "";
+  const type = body.type === "team" ? "team" : "individual";
 
   if (!name || !EMAIL_RE.test(email)) {
     return new Response(JSON.stringify({ error: "A valid name and email are required" }), {
@@ -40,7 +46,12 @@ export default async (req) => {
   }
 
   const apiKey = process.env.BREVO_API_KEY;
-  const listId = process.env.BREVO_LIST_ID;
+  const individualListId = process.env.BREVO_LIST_ID;
+  // Team signups go to BREVO_TEAM_LIST_ID when it's set; otherwise they fall
+  // back to the individual list rather than failing outright.
+  const listId = type === "team" && process.env.BREVO_TEAM_LIST_ID
+    ? process.env.BREVO_TEAM_LIST_ID
+    : individualListId;
 
   if (!apiKey || !listId) {
     console.error("subscribe: missing BREVO_API_KEY or BREVO_LIST_ID environment variable");
