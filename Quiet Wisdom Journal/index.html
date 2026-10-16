@@ -148,6 +148,19 @@ body{
   background:none; border:none; color:var(--accent); font-size:.85rem;
   text-decoration:underline; cursor:pointer; padding:4px; font-family:var(--font-sans);
 }
+.signup-type{ display:flex; gap:8px; width:100%; max-width:300px; }
+.signup-type-btn{
+  flex:1; appearance:none; cursor:pointer; font-family:var(--font-sans); font-weight:600;
+  font-size:.8rem; padding:10px 6px; border-radius:999px; border:1.5px solid var(--border);
+  background:var(--surface); color:var(--ink); letter-spacing:.2px;
+}
+.signup-type-btn[aria-pressed="true"]{
+  background:var(--accent); color:var(--accent-contrast); border-color:var(--accent);
+}
+.btn-sm{ padding:9px 20px; font-size:.78rem; }
+.btn-ghost.btn-sm{ text-decoration:none; display:inline-block; }
+#view-cover .cover-links{ display:flex; align-items:center; gap:12px; margin-top:-4px; }
+#view-cover .byline a{ color:inherit; text-decoration:underline; }
 .welcome-msg{ font-weight:600; font-size:1rem; margin:0 0 4px; }
 #welcomeBack{ flex-direction:column; align-items:center; gap:8px; width:100%; max-width:300px; }
 #welcomeBack:not([hidden]){ display:flex; }
@@ -278,6 +291,11 @@ textarea:focus, input[type="text"]:focus{ outline:2px solid var(--accent); outli
       </div>
       <p class="tagline">A 30-day practice in daily reflection, drawn from ancient wisdom.</p>
 
+      <div class="signup-type" id="signupType" role="group" aria-label="Who is this journal for?">
+        <button type="button" class="signup-type-btn" data-type="individual" aria-pressed="true">Just for me</button>
+        <button type="button" class="signup-type-btn" data-type="team" aria-pressed="false">For my team at work</button>
+      </div>
+
       <form class="signup-form" id="signupForm">
         <input type="text" id="leadName" placeholder="First name" autocomplete="given-name" required>
         <input type="email" id="leadEmail" placeholder="Email address" autocomplete="email" required>
@@ -293,7 +311,10 @@ textarea:focus, input[type="text"]:focus{ outline:2px solid var(--accent); outli
       </div>
 
       <div class="accentpicker" id="coverAccentPicker"></div>
-      <p class="byline">Dan Kewley · Clarity Edge Counselling</p>
+      <p class="byline"><a href="https://clarityedge.com.au" target="_blank" rel="noopener">Dan Kewley · Clarity Edge Counselling</a></p>
+      <div class="cover-links">
+        <a class="btn btn-ghost btn-sm" href="https://www.halaxy.com/book/appointment/daniel-kewley/location/1354861" target="_blank" rel="noopener">Book Now</a>
+      </div>
     </div>
   </section>
 
@@ -591,9 +612,21 @@ function renderCoverState(){
   }
 }
 
-function submitLead(name, email){
+var signupType = 'individual';
+
+document.querySelectorAll('.signup-type-btn').forEach(function(btn){
+  btn.addEventListener('click', function(){
+    signupType = btn.getAttribute('data-type');
+    document.querySelectorAll('.signup-type-btn').forEach(function(b){
+      b.setAttribute('aria-pressed', b === btn ? 'true' : 'false');
+    });
+  });
+});
+
+function submitLead(name, email, type){
   lsSet('cwj-lead-name', name);
   lsSet('cwj-lead-email', email);
+  lsSet('cwj-lead-type', type);
 
   // Send the lead to Brevo via our own serverless function, which holds the
   // Brevo API key privately (never exposed to the browser). This runs in the
@@ -603,7 +636,7 @@ function submitLead(name, email){
     fetch('/api/subscribe', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: name, email: email })
+      body: JSON.stringify({ name: name, email: email, type: type })
     }).catch(function(err){ console.error('subscribe request failed', err); });
   }catch(e){ console.error('subscribe request failed', e); }
 }
@@ -619,7 +652,7 @@ document.getElementById('signupForm').addEventListener('submit', function(e){
     return;
   }
   errEl.hidden = true;
-  submitLead(name, email);
+  submitLead(name, email, signupType);
   renderCoverState();
   enterJournal();
 });
@@ -639,6 +672,10 @@ document.getElementById('btnHowtoContinue').addEventListener('click', function()
 document.getElementById('btnSwitchAccount').addEventListener('click', function(){
   lsSet('cwj-lead-name', '');
   lsSet('cwj-lead-email', '');
+  signupType = 'individual';
+  document.querySelectorAll('.signup-type-btn').forEach(function(b){
+    b.setAttribute('aria-pressed', b.getAttribute('data-type') === 'individual' ? 'true' : 'false');
+  });
   renderCoverState();
 });
 
