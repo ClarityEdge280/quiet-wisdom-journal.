@@ -157,6 +157,12 @@ body{
 .signup-form:not([hidden]){ display:flex; }
 .signup-form input{ text-align:left; }
 .consent{ font-size:.72rem; color:var(--muted); line-height:1.4; margin:2px 0 0; }
+.privacy-link-row{ margin:6px 0 0; }
+.privacy-link-row .btn-link{ font-size:.72rem; padding:0; }
+.day-privacy-note{
+  display:flex; align-items:center; gap:6px; font-size:.72rem; color:var(--muted);
+  margin:0 18px 14px; padding:0;
+}
 .form-error{ color:var(--danger); font-size:.82rem; margin:0; }
 .btn-link{
   background:none; border:none; color:var(--accent); font-size:.85rem;
@@ -318,6 +324,7 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
         <button class="btn" type="submit">Start My Free Journal</button>
         <p class="form-error" id="signupError" hidden></p>
         <p class="consent">We'll send your journal access and occasional notes from Clarity Edge Counselling. Unsubscribe any time.</p>
+        <p class="privacy-link-row"><button type="button" class="btn-link" data-nav="privacy">What happens to what you write &rarr;</button></p>
       </form>
 
       <div id="welcomeBack" hidden>
@@ -346,6 +353,7 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
       <div class="navstack">
         <button class="navrow" data-nav="about" type="button"><span class="ic">&#9432;</span> About Dan Kewley</button>
         <button class="navrow" data-nav="howto" type="button"><span class="ic">&#128214;</span> How to Use This Journal</button>
+        <button class="navrow" data-nav="privacy" type="button"><span class="ic">&#128274;</span> Privacy &amp; How This Works</button>
         <button class="navrow" data-nav="notes" type="button"><span class="ic">&#9998;</span> My Notes</button>
       </div>
     </div>
@@ -363,6 +371,8 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
       <h2 id="dayTitle">Title</h2>
       <div class="daymeta-top" id="dayMeta" style="padding:0;margin-top:2px;">Weekday</div>
     </div>
+
+    <p class="day-privacy-note">&#128274; Private — what you write here stays on this device only.</p>
 
     <div class="card">
       <span class="k">Give</span>
@@ -424,6 +434,35 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
       <div id="howtoContent"></div>
       <div class="intro-cta" id="howtoIntroCta" hidden>
         <button class="btn" id="btnHowtoContinue" type="button">Enter the Journal</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="view" id="view-privacy" hidden>
+    <div class="topbar"><div class="inner" style="display:flex;align-items:center;gap:10px;width:100%;">
+      <button class="iconbtn" data-nav="contents" type="button">&#8962;</button>
+      <h1>Privacy &amp; How This Works</h1>
+    </div></div>
+    <div class="content">
+      <div class="prose">
+        <div class="howto-block">
+          <h3>What you write stays on your device</h3>
+          <p>Everything you type in this journal &mdash; your daily reflections, gratitude notes, and the Notes page &mdash; is saved only in your own browser, on your own device. It is never sent anywhere, never stored on a server, and nobody at Clarity Edge Counselling (or anyone else) can see it. There is no account, no database, and no way for us to read your entries even if we wanted to.</p>
+          <p>Because of this, your entries are tied to this device and this browser. If you clear your browser's site data, switch devices, or use a different browser, your entries won't carry over &mdash; there's no backup to restore from. If that matters to you, copy anything important somewhere safe as you go.</p>
+        </div>
+        <div class="howto-block">
+          <h3>What we do collect</h3>
+          <p>When you sign up, we collect your first name and email address so we can send you access to the journal and the occasional note from Clarity Edge Counselling. If you tell us this is for your team, we note that too, so we can tailor what we send. That's the full extent of what we collect through this journal.</p>
+          <p>This information is sent to Brevo, the email service we use to send journal access and updates. We don't sell or share it with anyone else. You can unsubscribe at any time from the link in any email we send, or email us directly to ask us to delete your details.</p>
+        </div>
+        <div class="howto-block">
+          <h3>This isn't a monitored service</h3>
+          <p>No one reads what you write here &mdash; not us, not anyone. This journal is a self-guided tool for private reflection, not a substitute for professional support, and it's separate from any clinical counselling relationship with Clarity Edge Counselling. If you're going through a difficult time and need to talk to someone, Lifeline is available 24/7 in Australia on 13&nbsp;11&nbsp;14, or reach out to your GP or a mental health professional.</p>
+        </div>
+        <div class="howto-block">
+          <h3>Questions</h3>
+          <p>If you have any questions about how this journal handles your information, you're welcome to get in touch via <a href="https://clarityedge.com.au" target="_blank" rel="noopener">clarityedge.com.au</a>.</p>
+        </div>
       </div>
     </div>
   </section>
