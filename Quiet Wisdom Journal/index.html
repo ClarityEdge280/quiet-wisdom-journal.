@@ -306,6 +306,56 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
   font-family:var(--font-serif);
 }
 
+/* ---- resume / pick up where you left off ---- */
+.resume-row{
+  display:flex; align-items:center; gap:14px; width:100%; margin-top:14px;
+  background:var(--accent); color:var(--accent-contrast);
+  border:none; border-radius:var(--radius);
+  padding:12px 14px; cursor:pointer; text-align:left; font-family:var(--font-sans);
+}
+.resume-row[hidden]{ display:none; }
+.resume-row:active{ opacity:.88; }
+.resume-row .resume-ic{
+  font-family:var(--font-serif); font-weight:600; font-size:1.1rem;
+  width:34px; height:34px; border-radius:50%; flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center;
+  background:rgba(127,127,127,.22);
+}
+.resume-row .resume-text{ flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+.resume-row .resume-title{ font-weight:700; font-size:.95rem; }
+.resume-row .resume-sub{ font-size:.8rem; opacity:.85; }
+.resume-row .chev{ font-size:1.1rem; flex:0 0 auto; opacity:.9; }
+
+/* ---- closing page ---- */
+.complete-head{ text-align:center; margin-bottom:20px; }
+.complete-head h2{
+  font-family:var(--font-serif); font-weight:600; font-size:1.6rem;
+  margin:8px 0 8px; line-height:1.2;
+}
+.complete-count{ color:var(--muted); font-size:.85rem; margin:0; }
+.then-now{ margin:4px 0 24px; }
+.then-now[hidden]{ display:none; }
+.tn-block{
+  background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);
+  padding:14px 16px; margin-bottom:10px;
+}
+.tn-block[hidden]{ display:none; }
+.tn-label{
+  font-weight:700; font-size:.72rem; letter-spacing:.09em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:6px; display:block;
+}
+.tn-text{
+  margin:0; font-family:var(--font-serif); font-size:1rem; line-height:1.5;
+  white-space:pre-wrap; overflow-wrap:anywhere;
+}
+.tn-note{
+  font-size:.8rem; color:var(--muted); font-style:italic;
+  font-family:var(--font-serif); margin:10px 2px 0;
+}
+.complete-actions{ display:flex; flex-direction:column; gap:10px; align-items:stretch; margin-top:4px; }
+.complete-actions .btn, .complete-actions .btn-ghost{ width:100%; text-align:center; }
+.btn-ghost.btn-link-like{ text-decoration:none; display:block; text-align:center; }
+
 /* ---- export ---- */
 .export-actions{ display:flex; flex-direction:column; gap:10px; margin-top:4px; }
 .export-actions .btn, .export-actions .btn-ghost{ width:100%; text-align:center; }
@@ -396,6 +446,14 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
         <div class="progress-label"><span>Your journal</span> <strong id="progressText">0 of 30 days</strong></div>
         <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
         <p class="progress-note" id="progressNote">Come and go as you need to &mdash; there's no such thing as behind.</p>
+        <button class="resume-row" id="resumeRow" type="button" hidden>
+          <span class="resume-ic" id="resumeIc">1</span>
+          <span class="resume-text">
+            <span class="resume-title" id="resumeTitle">Continue</span>
+            <span class="resume-sub" id="resumeSub"></span>
+          </span>
+          <span class="chev">&#8250;</span>
+        </button>
       </div>
       <div class="section-label">30 Days</div>
       <div class="daylist" id="dayList"></div>
@@ -535,6 +593,60 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
     </div>
   </section>
 
+  <section class="view" id="view-complete" hidden>
+    <div class="topbar"><div class="inner" style="display:flex;align-items:center;gap:10px;width:100%;">
+      <button class="iconbtn" data-nav="contents" type="button">&#8962;</button>
+      <h1>Closing Page</h1>
+    </div></div>
+    <div class="content">
+      <div class="complete-head">
+        <p class="series-label">Thirty Days</p>
+        <h2>You've reached the last page.</h2>
+        <p class="complete-count" id="completeCount"></p>
+      </div>
+
+      <div class="prose">
+        <p>However many days you wrote on, you gave yourself something most people never make time for &mdash; a few quiet minutes to think honestly about your own life, on purpose.</p>
+      </div>
+
+      <div class="then-now" id="thenNow" hidden>
+        <div class="tn-block" id="tnBlock1">
+          <span class="tn-label">Day 1 &mdash; you wrote</span>
+          <p class="tn-text" id="tnDay1"></p>
+        </div>
+        <div class="tn-block" id="tnBlock30">
+          <span class="tn-label">Day 30 &mdash; you wrote</span>
+          <p class="tn-text" id="tnDay30"></p>
+        </div>
+        <p class="tn-note" id="tnNote">Read them next to each other. You don't have to draw a conclusion from it &mdash; just notice.</p>
+      </div>
+
+      <div class="prose">
+        <div class="howto-block">
+          <h3>The practice is yours now</h3>
+          <p>Give, Raise, Reflect, Act is four questions, not an app. You can ask them of yourself on any ordinary day, with or without this page open &mdash; in your head on the drive home, or on the back of an envelope. That was always the point.</p>
+        </div>
+        <div class="howto-block">
+          <h3>Before you go</h3>
+          <p>What you wrote lives only in this browser. If you'd like to keep it, download a copy now.</p>
+        </div>
+      </div>
+
+      <div class="complete-actions">
+        <button class="btn" data-nav="export" type="button">Download my journal</button>
+        <button class="btn btn-ghost" data-nav="contents" type="button">Back to the thirty days</button>
+      </div>
+
+      <div class="prose" style="margin-top:26px;">
+        <div class="howto-block">
+          <h3>If you'd like to keep going</h3>
+          <p>You're welcome to start again from Day 1 &mdash; your entries stay exactly where they are. And if these thirty days surfaced something you'd rather not sit with on your own, talking it through with someone is a reasonable next step, not a last resort.</p>
+          <p><a class="btn btn-ghost btn-sm btn-link-like" href="https://www.halaxy.com/book/appointment/daniel-kewley/location/1354861" target="_blank" rel="noopener">Book a session with Dan</a></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section class="view" id="view-notes" hidden>
     <div class="topbar"><div class="inner" style="display:flex;align-items:center;gap:10px;width:100%;">
       <button class="iconbtn" data-nav="contents" type="button">&#8962;</button>
@@ -619,6 +731,67 @@ function renderProgress(){
   var text = document.getElementById('progressText');
   if (fill) fill.style.width = pct+'%';
   if (text) text.textContent = n+' of 30 days';
+}
+
+function nextUnstartedDay(){
+  for (var i=0;i<DAYS.length;i++){
+    if (!hasProgress(DAYS[i].num)) return DAYS[i];
+  }
+  return null;
+}
+
+function renderResume(){
+  var row = document.getElementById('resumeRow');
+  if (!row) return;
+  var n = countProgress();
+  if (n === 0){ row.hidden = true; return; }
+
+  var ic = document.getElementById('resumeIc');
+  var title = document.getElementById('resumeTitle');
+  var sub = document.getElementById('resumeSub');
+  var next = nextUnstartedDay();
+
+  if (next){
+    ic.textContent = next.num;
+    title.textContent = 'Continue from Day ' + next.num;
+    sub.textContent = next.title;
+    row.setAttribute('data-resume', 'day');
+  } else {
+    ic.innerHTML = '&#10003;';
+    title.textContent = 'Read your closing page';
+    sub.textContent = 'You wrote on all thirty days';
+    row.setAttribute('data-resume', 'complete');
+  }
+  row.hidden = false;
+}
+
+function openComplete(){
+  renderComplete();
+  showView('complete');
+}
+
+function renderComplete(){
+  var n = countProgress();
+  var cEl = document.getElementById('completeCount');
+  if (cEl){
+    cEl.textContent = (n === 30)
+      ? 'You wrote on all thirty days.'
+      : 'You wrote on ' + n + ' of these thirty days.';
+  }
+
+  var d1 = lsGet('cwj-day-1-reflect', '').trim() || lsGet('cwj-day-1-give', '').trim();
+  var d30 = lsGet('cwj-day-30-reflect', '').trim() || lsGet('cwj-day-30-give', '').trim();
+
+  var wrap = document.getElementById('thenNow');
+  if (!wrap) return;
+  if (!d1 && !d30){ wrap.hidden = true; return; }
+
+  wrap.hidden = false;
+  document.getElementById('tnBlock1').hidden = !d1;
+  document.getElementById('tnBlock30').hidden = !d30;
+  document.getElementById('tnDay1').textContent = d1;
+  document.getElementById('tnDay30').textContent = d30;
+  document.getElementById('tnNote').hidden = !(d1 && d30);
 }
 
 function buildExportText(){
@@ -755,6 +928,7 @@ function buildDayList(){
     list.appendChild(row);
   });
   renderProgress();
+  renderResume();
 }
 
 function escapeHtml(s){
@@ -788,9 +962,10 @@ function openDay(num){
   document.getElementById('fieldAct').value = lsGet('cwj-day-'+num+'-act', '');
 
   document.getElementById('btnDayPrev').disabled = (num <= 1);
-  document.getElementById('btnDayNext').disabled = (num >= 30);
   document.getElementById('btnDayPrevTop').disabled = (num <= 1);
-  document.getElementById('btnDayNextTop').disabled = (num >= 30);
+  document.getElementById('btnDayNext').disabled = false;
+  document.getElementById('btnDayNextTop').disabled = false;
+  document.getElementById('btnDayNext').innerHTML = (num >= 30) ? 'Finish &#8250;' : 'Next &#8250;';
 
   lsSet('cwj-last-day', String(num));
   showView('day');
@@ -810,7 +985,11 @@ function wireDayFields(){
 }
 
 function goPrevDay(){ if (currentDayNum && currentDayNum > 1) openDay(currentDayNum - 1); }
-function goNextDay(){ if (currentDayNum && currentDayNum < 30) openDay(currentDayNum + 1); }
+function goNextDay(){
+  if (!currentDayNum) return;
+  if (currentDayNum >= 30){ openComplete(); return; }
+  openDay(currentDayNum + 1);
+}
 
 function renderAbout(){
   var el = document.getElementById('aboutBio');
@@ -948,11 +1127,18 @@ document.querySelectorAll('[data-nav]').forEach(function(el){
     showView(target);
     if (target === 'contents') buildDayList();
     if (target === 'export') renderExportMeta();
+    if (target === 'complete') renderComplete();
   });
 });
 
 document.getElementById('notesArea').addEventListener('input', function(){
   lsSet('cwj-notes', document.getElementById('notesArea').value);
+});
+
+document.getElementById('resumeRow').addEventListener('click', function(){
+  if (this.getAttribute('data-resume') === 'complete'){ openComplete(); return; }
+  var next = nextUnstartedDay();
+  if (next) openDay(next.num);
 });
 
 document.getElementById('btnExportText').addEventListener('click', function(){
