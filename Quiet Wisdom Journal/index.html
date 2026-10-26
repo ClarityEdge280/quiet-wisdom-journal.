@@ -286,6 +286,51 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
 .intro-cta:not([hidden]){ display:flex; }
 #view-notes textarea#notesArea{ min-height:60vh; }
 
+/* ---- progress (soft, no streaks) ---- */
+.progress-wrap{ margin:2px 0 22px; }
+.progress-label{
+  display:flex; justify-content:space-between; align-items:baseline;
+  font-family:var(--font-sans); font-size:.82rem; color:var(--muted); margin-bottom:8px;
+}
+.progress-label strong{ color:var(--ink); font-weight:700; }
+.progress-track{
+  position:relative; height:10px; border-radius:999px; background:var(--surface-2);
+  border:1px solid var(--border); overflow:hidden;
+}
+.progress-fill{
+  position:absolute; top:0; left:0; bottom:0; border-radius:999px;
+  background:var(--accent); transition:width .5s ease;
+}
+.progress-note{
+  font-size:.78rem; color:var(--muted); margin:9px 0 0; font-style:italic;
+  font-family:var(--font-serif);
+}
+
+/* ---- export ---- */
+.export-actions{ display:flex; flex-direction:column; gap:10px; margin-top:4px; }
+.export-actions .btn, .export-actions .btn-ghost{ width:100%; text-align:center; }
+.export-meta{ color:var(--muted); font-size:.85rem; margin:14px 0 0; }
+
+#printArea{ display:none; }
+@media print{
+  #app{ display:none !important; }
+  html, body{ background:#fff !important; }
+  #printArea{
+    display:block !important; max-width:640px; margin:0 auto; padding:24px;
+    font-family:Georgia,'Times New Roman',serif; color:#222; background:#fff;
+  }
+  #printArea .p-cover{ text-align:center; margin-bottom:36px; }
+  #printArea .p-cover h1{ font-size:2rem; margin:0 0 4px; }
+  #printArea .p-cover p{ color:#555; font-style:italic; margin:0; }
+  #printArea .p-day{ margin-bottom:28px; page-break-inside:avoid; }
+  #printArea .p-day h2{ font-size:1.2rem; margin:0 0 2px; }
+  #printArea .p-day .p-meta{ font-size:.8rem; color:#666; margin-bottom:10px; }
+  #printArea .p-day .p-k{ font-weight:bold; font-size:.78rem; text-transform:uppercase; letter-spacing:.05em; margin:10px 0 2px; }
+  #printArea .p-day p{ margin:0 0 6px; }
+  #printArea .p-day blockquote{ font-style:italic; color:#444; margin:8px 0; }
+  #printArea hr{ border:none; border-top:1px solid #ccc; margin:20px 0; }
+}
+
 @media (min-width:560px){
   .content{ max-width:560px; margin:0 auto; width:100%; }
   .topbar > div.inner{ max-width:560px; margin:0 auto; width:100%; }
@@ -347,6 +392,11 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
       <button class="iconbtn" id="btnAccentContents" title="Accent colour" type="button">&#9679;</button>
     </div></div>
     <div class="content">
+      <div class="progress-wrap" id="progressWrap">
+        <div class="progress-label"><span>Your journal</span> <strong id="progressText">0 of 30 days</strong></div>
+        <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+        <p class="progress-note" id="progressNote">Come and go as you need to &mdash; there's no such thing as behind.</p>
+      </div>
       <div class="section-label">30 Days</div>
       <div class="daylist" id="dayList"></div>
       <div class="section-label">More</div>
@@ -354,6 +404,7 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
         <button class="navrow" data-nav="about" type="button"><span class="ic">&#9432;</span> About Dan Kewley</button>
         <button class="navrow" data-nav="howto" type="button"><span class="ic">&#128214;</span> How to Use This Journal</button>
         <button class="navrow" data-nav="privacy" type="button"><span class="ic">&#128274;</span> Privacy &amp; How This Works</button>
+        <button class="navrow" data-nav="export" type="button"><span class="ic">&#11015;</span> Export My Journal</button>
         <button class="navrow" data-nav="notes" type="button"><span class="ic">&#9998;</span> My Notes</button>
       </div>
     </div>
@@ -448,7 +499,7 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
         <div class="howto-block">
           <h3>What you write stays on your device</h3>
           <p>Everything you type in this journal &mdash; your daily reflections, gratitude notes, and the Notes page &mdash; is saved only in your own browser, on your own device. It is never sent anywhere, never stored on a server, and nobody at Clarity Edge Counselling (or anyone else) can see it. There is no account, no database, and no way for us to read your entries even if we wanted to.</p>
-          <p>Because of this, your entries are tied to this device and this browser. If you clear your browser's site data, switch devices, or use a different browser, your entries won't carry over &mdash; there's no backup to restore from. If that matters to you, copy anything important somewhere safe as you go.</p>
+          <p>Because of this, your entries are tied to this device and this browser. If you clear your browser's site data, switch devices, or use a different browser, your entries won't carry over &mdash; there's no backup to restore from. If that matters to you, use <strong>Export My Journal</strong> from the contents screen any time to download a copy of everything you've written.</p>
         </div>
         <div class="howto-block">
           <h3>What we do collect</h3>
@@ -467,6 +518,23 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
     </div>
   </section>
 
+  <section class="view" id="view-export" hidden>
+    <div class="topbar"><div class="inner" style="display:flex;align-items:center;gap:10px;width:100%;">
+      <button class="iconbtn" data-nav="contents" type="button">&#8962;</button>
+      <h1>Export My Journal</h1>
+    </div></div>
+    <div class="content">
+      <div class="prose">
+        <p>Your entries live only in this browser, so it's worth keeping your own copy &mdash; especially if you've been writing for a while. Both options below work entirely on this device; nothing is uploaded anywhere.</p>
+      </div>
+      <div class="export-actions">
+        <button class="btn" id="btnExportText" type="button">Download as a text file</button>
+        <button class="btn-ghost" id="btnExportPrint" type="button">Print / Save as PDF</button>
+      </div>
+      <p class="export-meta" id="exportMeta"></p>
+    </div>
+  </section>
+
   <section class="view" id="view-notes" hidden>
     <div class="topbar"><div class="inner" style="display:flex;align-items:center;gap:10px;width:100%;">
       <button class="iconbtn" data-nav="contents" type="button">&#8962;</button>
@@ -478,6 +546,8 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
   </section>
 
 </div>
+
+<div id="printArea" aria-hidden="true"></div>
 
 <script>
 var DAYS = [{"num": 1, "weekday": "Mon · Week 1", "title": "Know the Difference", "subtitle": "Facing Worry & Uncertainty", "quote": "There are certain things you can control and certain things you can’t control, and you must know the difference.", "attrib": "Epictetus, Greek Philosopher (55–135 AD)", "reflectQ": "What’s one thing on your mind right now that you can actually influence — and one you need to let go of?"}, {"num": 2, "weekday": "Tue · Week 1", "title": "Borrowing Trouble", "subtitle": "Facing Worry & Uncertainty", "quote": "My life has been full of terrible misfortunes, most of which never happened.", "attrib": "Michel de Montaigne, French Philosopher (1533–1592)", "reflectQ": "How much of today’s worry is about something that hasn’t actually happened yet?"}, {"num": 3, "weekday": "Wed · Week 1", "title": "This Too Shall Pass", "subtitle": "Facing Worry & Uncertainty", "quote": "This too shall pass.", "attrib": "Sufi Teaching (a favourite saying of Abraham Lincoln)", "reflectQ": "What’s something hard right now that won’t look the same in six months?"}, {"num": 4, "weekday": "Thu · Week 1", "title": "Fortune Favours", "subtitle": "Facing Worry & Uncertainty", "quote": "Fortune is not on the side of the faint-hearted.", "attrib": "Sophocles, Greek Playwright (497–406 BC)", "reflectQ": "Where has hesitation cost you more than the risk itself would have?"}, {"num": 5, "weekday": "Fri · Week 1", "title": "Forget the Future", "subtitle": "Facing Worry & Uncertainty", "quote": "The future you shall know when it has come; before then, forget it.", "attrib": "Aeschylus, Greek Playwright (525–456 BC)", "reflectQ": "What would change if you set down next week’s worries until next week?"}, {"num": 6, "weekday": "Mon · Week 2", "title": "Be Happy With What You Have", "subtitle": "Gratitude & Contentment", "quote": "He is a wise man who does not grieve for the things which he has not, but rejoices for those which he has.", "attrib": "Epictetus, Greek Philosopher (55–135 AD)", "reflectQ": "What do you already have that you’d miss if it were gone?"}, {"num": 7, "weekday": "Tue · Week 2", "title": "Enjoy Less", "subtitle": "Gratitude & Contentment", "quote": "The secret of happiness, you see, is not found in seeking more, but in developing the capacity to enjoy less.", "attrib": "Socrates, Greek Philosopher (469–399 BC)", "reflectQ": "Where are you chasing “more” when contentment is already within reach?"}, {"num": 8, "weekday": "Wed · Week 2", "title": "Guard Your Heart", "subtitle": "Gratitude & Contentment", "quote": "Above all else, guard your heart, for it is the wellspring of life.", "attrib": "King Solomon, Proverbs 4:23", "reflectQ": "What have you been letting into your heart lately that doesn’t deserve to be there?"}, {"num": 9, "weekday": "Thu · Week 2", "title": "Nothing Is Certain", "subtitle": "Gratitude & Contentment", "quote": "In these matters the only certainty is that nothing is certain.", "attrib": "Pliny the Elder, Roman Savant (23–79 AD)", "reflectQ": "What are you gripping tightly that you could hold more loosely?"}, {"num": 10, "weekday": "Fri · Week 2", "title": "New Beginnings", "subtitle": "Gratitude & Contentment", "quote": "From the end spring new beginnings.", "attrib": "Pliny the Elder, Roman Savant (23–79 AD)", "reflectQ": "What ending this week could actually be the start of something better?"}, {"num": 11, "weekday": "Mon · Week 3", "title": "Ruler of Yourself", "subtitle": "Self-Mastery & Discipline", "quote": "I am indeed a king, because I know how to rule myself.", "attrib": "Pietro Aretino, Italian Author (1492–1556)", "reflectQ": "Where in your life would ruling yourself well matter more than controlling anything outside you?"}, {"num": 12, "weekday": "Tue · Week 3", "title": "Wrestling, Not Dancing", "subtitle": "Self-Mastery & Discipline", "quote": "The art of living is more like wrestling than dancing.", "attrib": "Marcus Aurelius, Roman Emperor and Philosopher (121–180 AD)", "reflectQ": "Where have you been expecting life to be effortless when it was always going to take effort?"}, {"num": 13, "weekday": "Wed · Week 3", "title": "Dyed by Your Thoughts", "subtitle": "Self-Mastery & Discipline", "quote": "The soul becomes dyed with the color of its thoughts.", "attrib": "Marcus Aurelius, Roman Emperor and Philosopher (121–180 AD)", "reflectQ": "What have your thoughts been “dyeing” your mood with lately — and is that the colour you want?"}, {"num": 14, "weekday": "Thu · Week 3", "title": "Clouded by Anger", "subtitle": "Self-Mastery & Discipline", "quote": "Anger so clouds the mind, that it cannot perceive the truth.", "attrib": "Cato the Elder, Roman Orator and Politician (234–149 BC)", "reflectQ": "Where has anger recently stopped you from seeing something clearly?"}, {"num": 15, "weekday": "Fri · Week 3", "title": "Embrace Simplicity", "subtitle": "Self-Mastery & Discipline", "quote": "Embrace simplicity.", "attrib": "Lao Tzu, Chinese Philosopher (604–531 BC)", "reflectQ": "What could you strip back this week to make room for what actually matters?"}, {"num": 16, "weekday": "Mon · Week 4", "title": "Great Risk, Great Reward", "subtitle": "Courage & Action", "quote": "Great deeds are usually wrought at great risk.", "attrib": "Herodotus, Greek Historian and Traveller (484–430 BC)", "reflectQ": "What’s a worthwhile risk you’ve been avoiding?"}, {"num": 17, "weekday": "Tue · Week 4", "title": "We Don’t Dare", "subtitle": "Courage & Action", "quote": "It is not because things are difficult that we do not dare, it is because we do not dare that they are difficult.", "attrib": "Seneca, Roman Philosopher (4 BC–65 AD)", "reflectQ": "Is something actually difficult, or does it only feel difficult because you haven’t started?"}, {"num": 18, "weekday": "Wed · Week 4", "title": "The Courage to Live", "subtitle": "Courage & Action", "quote": "Sometimes even to live is an act of courage.", "attrib": "Seneca, Roman Philosopher (4 BC–65 AD)", "reflectQ": "What would it look like to show up fully today, even when it’s hard?"}, {"num": 19, "weekday": "Thu · Week 4", "title": "Opportunity in Chaos", "subtitle": "Courage & Action", "quote": "In the midst of chaos, there is also opportunity.", "attrib": "Sun Tzu, Chinese Military Strategist (~544–496 BC)", "reflectQ": "Where might the mess you’re in actually be hiding an opportunity?"}, {"num": 20, "weekday": "Fri · Week 4", "title": "One Single Step", "subtitle": "Courage & Action", "quote": "A journey of a thousand miles begins with a single step.", "attrib": "Lao-Tzu, Chinese Philosopher (604–531 BC)", "reflectQ": "What’s the smallest possible first step toward something big you want?"}, {"num": 21, "weekday": "Mon · Week 5", "title": "A Second Self", "subtitle": "Relationships & Kindness", "quote": "A friend is a second self.", "attrib": "Aristotle, Greek Philosopher (384–322 BC)", "reflectQ": "Who in your life feels like an extension of yourself — and when did you last tell them that?"}, {"num": 22, "weekday": "Tue · Week 5", "title": "The Water of Life", "subtitle": "Relationships & Kindness", "quote": "True friendship is born out of love and is the water of life.", "attrib": "Rumi, Persian Mystic Poet (13th Century)", "reflectQ": "Where has friendship carried you through something you couldn’t have carried alone?"}, {"num": 23, "weekday": "Wed · Week 5", "title": "Forget Injuries", "subtitle": "Relationships & Kindness", "quote": "Forget injuries, never forget kindnesses.", "attrib": "Confucius, Chinese Philosopher (551–479 BC)", "reflectQ": "What old hurt are you still keeping a tally of that you could set down?"}, {"num": 24, "weekday": "Thu · Week 5", "title": "Giving Without Bargaining", "subtitle": "Relationships & Kindness", "quote": "Those who give hoping to be rewarded with honor are not giving, they are bargaining.", "attrib": "Philo, Philosopher (20 BC–40 AD)", "reflectQ": "Is there something you’ve given lately while quietly expecting something back?"}, {"num": 25, "weekday": "Fri · Week 5", "title": "Love Your Enemies", "subtitle": "Relationships & Kindness", "quote": "Love your enemies, do good to them that hate you, bless them that curse you, and pray for them that despitefully use you.", "attrib": "Matthew 5:44", "reflectQ": "Who is hardest for you to wish well right now — and what would softening toward them actually cost you?"}, {"num": 26, "weekday": "Mon · Week 6", "title": "No Fresh Tears for Old Griefs", "subtitle": "Perseverance & New Beginnings", "quote": "Waste not fresh tears over old griefs.", "attrib": "Euripides, Greek Playwright (480–406 BC)", "reflectQ": "What old grief are you still re-living as if it just happened?"}, {"num": 27, "weekday": "Tue · Week 6", "title": "A Matter of Opportunity", "subtitle": "Perseverance & New Beginnings", "quote": "Healing is a matter of time, but it is sometimes also a matter of opportunity.", "attrib": "Hippocrates, Greek Physician (460–377 BC)", "reflectQ": "Is there a window open right now for healing that you might be about to miss?"}, {"num": 28, "weekday": "Wed · Week 6", "title": "Slow Is Fine", "subtitle": "Perseverance & New Beginnings", "quote": "It does not matter how slowly you go so long as you do not stop.", "attrib": "Confucius, Chinese Philosopher (551–479 BC)", "reflectQ": "Where have you stopped altogether, when slowing down would have been enough?"}, {"num": 29, "weekday": "Thu · Week 6", "title": "Iron Sharpens Iron", "subtitle": "Perseverance & New Beginnings", "quote": "As iron sharpens iron, so one person sharpens another.", "attrib": "Proverbs 27:17", "reflectQ": "Who sharpens you — and when did you last let them?"}, {"num": 30, "weekday": "Fri · Week 6", "title": "Do Not Give Up", "subtitle": "Perseverance & New Beginnings", "quote": "Let us not become weary in doing good, for at the proper time we will reap a harvest if we do not give up.", "attrib": "Galatians 6:9", "reflectQ": "Looking back over these 30 days, where have you nearly given up — and what kept you going?"}];
@@ -536,6 +606,135 @@ function hasProgress(num){
   return false;
 }
 
+function countProgress(){
+  var c = 0;
+  for (var i=0;i<DAYS.length;i++){ if (hasProgress(DAYS[i].num)) c++; }
+  return c;
+}
+
+function renderProgress(){
+  var n = countProgress();
+  var pct = Math.round((n/30)*100);
+  var fill = document.getElementById('progressFill');
+  var text = document.getElementById('progressText');
+  if (fill) fill.style.width = pct+'%';
+  if (text) text.textContent = n+' of 30 days';
+}
+
+function buildExportText(){
+  var lines = [];
+  lines.push('QUIET \u00B7 WISDOM \u2014 My Journal');
+  lines.push('Dan Kewley \u00B7 Clarity Edge Counselling');
+  lines.push('Exported ' + (new Date()).toLocaleDateString());
+  lines.push('');
+  lines.push('========================================');
+  DAYS.forEach(function(d){
+    if (!hasProgress(d.num)) return;
+    lines.push('');
+    lines.push('Day ' + d.num + ' \u2014 ' + d.title + ' (' + d.weekday + ')');
+    lines.push(d.subtitle);
+    lines.push('');
+    var give = lsGet('cwj-day-'+d.num+'-give', '');
+    if (give.trim()){
+      lines.push('GIVE');
+      lines.push('Is there anything I am worried about today?');
+      lines.push(give);
+      lines.push('');
+    }
+    var r1 = lsGet('cwj-day-'+d.num+'-raise1', ''), r2 = lsGet('cwj-day-'+d.num+'-raise2', ''), r3 = lsGet('cwj-day-'+d.num+'-raise3', '');
+    if (r1.trim() || r2.trim() || r3.trim()){
+      lines.push('RAISE \u2014 Three things I am grateful for:');
+      if (r1.trim()) lines.push('1. ' + r1);
+      if (r2.trim()) lines.push('2. ' + r2);
+      if (r3.trim()) lines.push('3. ' + r3);
+      lines.push('');
+    }
+    var reflect = lsGet('cwj-day-'+d.num+'-reflect', '');
+    if (reflect.trim()){
+      lines.push('REFLECT');
+      lines.push('\u201C' + d.quote + '\u201D \u2014 ' + d.attrib);
+      lines.push(d.reflectQ);
+      lines.push(reflect);
+      lines.push('');
+    }
+    var act = lsGet('cwj-day-'+d.num+'-act', '');
+    if (act.trim()){
+      lines.push('ACT \u2014 Today I will\u2026');
+      lines.push(act);
+      lines.push('');
+    }
+    lines.push('----------------------------------------');
+  });
+  var notes = lsGet('cwj-notes', '');
+  if (notes.trim()){
+    lines.push('');
+    lines.push('MY NOTES');
+    lines.push(notes);
+  }
+  return lines.join('\n');
+}
+
+function downloadTextFile(filename, text){
+  try{
+    var blob = new Blob([text], {type:'text/plain;charset=utf-8'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }catch(e){ console.error('export failed', e); }
+}
+
+function renderExportMeta(){
+  var n = countProgress();
+  var el = document.getElementById('exportMeta');
+  if (!el) return;
+  if (n === 0){
+    el.textContent = "You haven't written anything yet \u2014 once you've filled in a day or two, come back here to download a copy.";
+  } else {
+    var hasNotes = lsGet('cwj-notes', '').trim() !== '';
+    el.textContent = 'Includes ' + n + ' of 30 days you\u2019ve written in' + (hasNotes ? ', plus My Notes.' : '.');
+  }
+}
+
+function buildPrintHtml(){
+  var html = '<div class="p-cover"><h1>Quiet \u00B7 Wisdom</h1><p>My Journal \u2014 Dan Kewley, Clarity Edge Counselling</p></div>';
+  DAYS.forEach(function(d){
+    if (!hasProgress(d.num)) return;
+    html += '<div class="p-day"><h2>Day ' + d.num + ' \u2014 ' + escapeHtml(d.title) + '</h2>';
+    html += '<div class="p-meta">' + escapeHtml(d.weekday) + ' &middot; ' + escapeHtml(d.subtitle) + '</div>';
+    var give = lsGet('cwj-day-'+d.num+'-give', '');
+    if (give.trim()){
+      html += '<div class="p-k">Give</div><p>' + escapeHtml(give).replace(/\n/g,'<br>') + '</p>';
+    }
+    var r1 = lsGet('cwj-day-'+d.num+'-raise1', ''), r2 = lsGet('cwj-day-'+d.num+'-raise2', ''), r3 = lsGet('cwj-day-'+d.num+'-raise3', '');
+    if (r1.trim() || r2.trim() || r3.trim()){
+      html += '<div class="p-k">Raise</div><p>';
+      if (r1.trim()) html += '1. ' + escapeHtml(r1) + '<br>';
+      if (r2.trim()) html += '2. ' + escapeHtml(r2) + '<br>';
+      if (r3.trim()) html += '3. ' + escapeHtml(r3);
+      html += '</p>';
+    }
+    var reflect = lsGet('cwj-day-'+d.num+'-reflect', '');
+    if (reflect.trim()){
+      html += '<div class="p-k">Reflect</div><blockquote>&ldquo;' + escapeHtml(d.quote) + '&rdquo; &mdash; ' + escapeHtml(d.attrib) + '</blockquote>';
+      html += '<p>' + escapeHtml(reflect).replace(/\n/g,'<br>') + '</p>';
+    }
+    var act = lsGet('cwj-day-'+d.num+'-act', '');
+    if (act.trim()){
+      html += '<div class="p-k">Act</div><p>' + escapeHtml(act) + '</p>';
+    }
+    html += '</div><hr>';
+  });
+  var notes = lsGet('cwj-notes', '');
+  if (notes.trim()){
+    html += '<div class="p-day"><h2>My Notes</h2><p>' + escapeHtml(notes).replace(/\n/g,'<br>') + '</p></div>';
+  }
+  return html;
+}
+
 function buildDayList(){
   var list = document.getElementById('dayList');
   list.innerHTML = '';
@@ -555,6 +754,7 @@ function buildDayList(){
     }(d.num));
     list.appendChild(row);
   });
+  renderProgress();
 }
 
 function escapeHtml(s){
@@ -747,11 +947,23 @@ document.querySelectorAll('[data-nav]').forEach(function(el){
     var target = el.getAttribute('data-nav');
     showView(target);
     if (target === 'contents') buildDayList();
+    if (target === 'export') renderExportMeta();
   });
 });
 
 document.getElementById('notesArea').addEventListener('input', function(){
   lsSet('cwj-notes', document.getElementById('notesArea').value);
+});
+
+document.getElementById('btnExportText').addEventListener('click', function(){
+  if (countProgress() === 0){ renderExportMeta(); return; }
+  downloadTextFile('quiet-wisdom-journal.txt', buildExportText());
+});
+
+document.getElementById('btnExportPrint').addEventListener('click', function(){
+  if (countProgress() === 0){ renderExportMeta(); return; }
+  document.getElementById('printArea').innerHTML = buildPrintHtml();
+  window.print();
 });
 
 wireDayFields();
