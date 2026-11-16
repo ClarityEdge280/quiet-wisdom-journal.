@@ -14,6 +14,7 @@
 <script>
 var JOURNAL = {
   "id": "quiet-wisdom",
+  "migrateFrom": "cwj",
   "name": "Quiet",
   "series": "Wisdom",
   "docTitle": "Quiet · Wisdom",
@@ -556,6 +557,24 @@ textarea:focus, input[type="text"]:focus, input[type="email"]:focus{ outline:2px
 </head>
 <body>
 <script>
+/* One-off carry-over from an earlier storage prefix: sign-in, colour choice and the
+   free Notes page only. Day entries are deliberately left behind. */
+(function(){
+  try{
+    var from = JOURNAL.migrateFrom;
+    if (!from || from === JOURNAL.id) return;
+    if (localStorage.getItem(JOURNAL.id + '-migrated')) return;
+    var okAccent = JOURNAL.accents.map(function(a){ return a.key; });
+    ['lead-name','lead-email','lead-type','intro-seen','accent','notes'].forEach(function(k){
+      var old = localStorage.getItem(from + '-' + k);
+      if (old === null || old === '') return;
+      if (k === 'accent' && okAccent.indexOf(old) === -1) return;
+      if (localStorage.getItem(JOURNAL.id + '-' + k) !== null) return;
+      localStorage.setItem(JOURNAL.id + '-' + k, old);
+    });
+    localStorage.setItem(JOURNAL.id + '-migrated', '1');
+  }catch(e){}
+})();
 (function(){
   try{
     var a = localStorage.getItem(JOURNAL.id + '-accent') || JOURNAL.accents[0].key;
